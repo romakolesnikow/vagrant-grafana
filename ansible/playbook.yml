@@ -1,6 +1,6 @@
 ---
 - name: Установка Docker и Docker Compose на Ubuntu 20.04
-  hosts: your_target_server
+  hosts: all
   become: yes  # Позволяет использовать привилегии sudo
 
   tasks:
