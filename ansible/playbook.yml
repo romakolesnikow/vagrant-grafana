@@ -1,0 +1,49 @@
+---
+- name: Установка Docker и Docker Compose на Ubuntu 20.04
+  hosts: your_target_server
+  become: yes  # Позволяет использовать привилегии sudo
+
+  tasks:
+    - name: Обновить кэш пакетов
+      apt:
+        update_cache: yes
+
+    - name: Установить зависимости для использования репозитория HTTPS
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+
+    - name: Добавить официальный GPG-ключ Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Добавить официальный репозиторий Docker
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Обновить кэш пакетов после добавления репозитория Docker
+      apt:
+        update_cache: yes
+
+    - name: Установить Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Установить Docker Compose
+      shell: >
+        curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        && chmod +x /usr/local/bin/docker-compose
+      args:
+        executable: /bin/bash
+
+    - name: Перезапустить службу Docker
+      systemd:
+        name: docker
+        state: restarted
